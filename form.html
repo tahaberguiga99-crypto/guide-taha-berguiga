@@ -317,7 +317,7 @@ document.getElementById('umrahForm').addEventListener('submit',function(e){
   document.getElementById('message').style.display='block';
   form.style.display='none';
 
-  fetch('https://script.google.com/macros/s/AKfycbwbxMHpUMcOfzk2CqdMbFM0EWij31KkPDMgNAQ-pqmXfVh15Rbxw5VokqhYUrOibq9-ag/exec',{
+  fetch('https://script.google.com/macros/s/AKfycbzg7Vawft6yyEb2gq7tbwnDq9BHSa0KhcjsbjqYGHP_mhjO4mTBp7S_O8d7vkVewzA/exec',{
     method:'POST', body:formData
   })
   .then(res=>res.text())
