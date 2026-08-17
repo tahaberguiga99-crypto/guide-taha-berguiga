@@ -902,9 +902,10 @@
     document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
 
     /* Notifications */
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbzPp2uk0EIIgGAECnlQD3AoEzvGs5IEgkbX-rb5lg_YLBvBR1ZcIbUb6zTNXc_i9iNh/exec";
     const userEmail = localStorage.getItem("userEmail");
     if (userEmail) {
-      fetch(`https://script.google.com/macros/s/AKfycbzr9XTABt-6PkmU2WzqhRAzB5e2NpwBfxwribjz5wZSm6v4QqOJ5FH563IfqGZpznZV6A/exec?email=${encodeURIComponent(userEmail)}&unread=true`)
+      fetch(`${GAS_URL}?sheet=notifications&email=${encodeURIComponent(userEmail)}&unread=true`)
         .then(r => r.json())
         .then(data => {
           if (Array.isArray(data) && data.length > 0) {
@@ -917,11 +918,10 @@
     /* Visit tracker */
     window.addEventListener("load", () => {
       if (!localStorage.getItem("visitedOnce")) {
-        fetch("https://script.google.com/macros/s/AKfycbzg7Vawft6yyEb2gq7tbwnDq9BHSa0KhcjsbjqYGHP_mhjO4mTBp7S_O8d7vkVewzA/exec", { method: "POST" })
+        fetch(GAS_URL + "?sheet=visits", { method: "POST" })
           .then(() => localStorage.setItem("visitedOnce","true")).catch(()=>{});
       }
     });
   </script>
 </body>
 </html>
-
