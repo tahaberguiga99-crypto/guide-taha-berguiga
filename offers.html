@@ -777,7 +777,8 @@ footer span { color: var(--teal); font-weight: 700; }
 </footer>
 
 <script>
-const SHEET_URL = "https://script.google.com/macros/s/AKfycbyNh1kbIiJaZozgzm5EstDUoJ7_8n5FSMTQEWOK-SHRKkdm38MRCzU93kCF3W5dsvU/exec";
+const GAS_BASE = "https://script.google.com/macros/s/AKfycbzPp2uk0EIIgGAECnlQD3AoEzvGs5IEgkbX-rb5lg_YLBvBR1ZcIbUb6zTNXc_i9iNh/exec";
+const SHEET_URL = GAS_BASE + "?sheet=offers";
 let offersData = [];
 
 function openSidebar() {
@@ -817,7 +818,7 @@ function parseArabicDayMonth(text) {
 
 function toggleLike(id) {
   if (localStorage.getItem("liked_"+id)) return;
-  fetch(SHEET_URL+"?action=like&id="+id)
+  fetch(SHEET_URL+"&action=like&id="+id)
     .then(r=>r.json())
     .then(r=>{
       if(r.success) {
