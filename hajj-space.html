@@ -159,6 +159,7 @@
 
     <!-- نموذج الحجز الجديد -->
     <form id="bookingForm" style="margin-top:20px;">
+      <input type="hidden" name="sheet" value="hajj">
       <label>الاسم الكامل:
         <input type="text" name="name" required>
       </label>
@@ -203,7 +204,7 @@
 document.getElementById("bookingForm").addEventListener("submit", function(e){
   e.preventDefault();
   var formData = new FormData(this);
-  fetch("https://script.google.com/macros/s/AKfycbzg7Vawft6yyEb2gq7tbwnDq9BHSa0KhcjsbjqYGHP_mhjO4mTBp7S_O8d7vkVewzA/exec", {
+  fetch("https://script.google.com/macros/s/AKfycbzPp2uk0EIIgGAECnlQD3AoEzvGs5IEgkbX-rb5lg_YLBvBR1ZcIbUb6zTNXc_i9iNh/exec", {
     method: "POST",
     body: formData
   })
