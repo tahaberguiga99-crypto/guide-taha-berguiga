@@ -745,7 +745,8 @@ body {
 </div>
 
 <script>
-const apiURL = "https://script.google.com/macros/s/AKfycbzg7Vawft6yyEb2gq7tbwnDq9BHSa0KhcjsbjqYGHP_mhjO4mTBp7S_O8d7vkVewzA/exec";
+const GAS_BASE = "https://script.google.com/macros/s/AKfycbzPp2uk0EIIgGAECnlQD3AoEzvGs5IEgkbX-rb5lg_YLBvBR1ZcIbUb6zTNXc_i9iNh/exec";
+const apiURL = GAS_BASE + "?sheet=offers";
 const id = new URLSearchParams(location.search).get("id");
 let currentOffer = null;
 
@@ -957,7 +958,7 @@ function likeOffer() {
   if (!currentOffer) return;
   if (localStorage.getItem("liked_" + currentOffer.ID)) return;
 
-  fetch(apiURL + "?action=like&id=" + currentOffer.ID)
+  fetch(apiURL + "&action=like&id=" + currentOffer.ID)
     .then(r => r.json())
     .then(r => {
       if (r.success) {
@@ -1002,5 +1003,3 @@ document.addEventListener("keydown", e => { if (e.key === "Escape") closeLightbo
 </script>
 </body>
 </html>
-
-    
