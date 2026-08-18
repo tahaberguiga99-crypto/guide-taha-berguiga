@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>تحميل جواز السفر</title>
+  <style>
+    body {
+      background: url('https://i.postimg.cc/JhKnMv57/FB-IMG-1753464094985.jpg') no-repeat center center fixed;
+      background-size: cover;
+      background-position: center;
+      margin: 0;
+      padding: 0;
+      font-family: 'Tahoma', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      background: rgba(255, 255, 255, 0.85);
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 10px #ccc;
+      max-width: 300px;
+      text-align: center;
+    }
+
+    input, button {
+      margin: 10px 0;
+      padding: 10px;
+      width: 90%;
+      font-size: 1rem;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      background: #007bff;
+      color: #fff;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #0056b3;
+    }
+
+    #status {
+      margin-top: 10px;
+      font-weight: bold;
+      color: #333;
+    }
+
+    .info {
+      margin-top: 10px;
+      color: #444;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>تحميل جواز السفر</h2>
+    <form id="passportForm">
+      <input type="text" name="name" placeholder="الاسم الكامل" required>
+      <input type="tel" name="phone" placeholder="رقم الهاتف" required>
+      <input type="file" name="passport" accept=".pdf,.jpg,.jpeg,.png" required>
+      <button type="submit">إرسال</button>
+    </form>
+    <p id="status"></p>
+    <p class="info">🔒 نطمئنك أن وثائقك محفوظة ومحمية بإذن الله.</p>
+  </div>
+
+  <script>
+    document.getElementById("passportForm").addEventListener("submit", async function (e) {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const file = formData.get("passport");
+
+      if (!file) {
+        document.getElementById("status").innerText = "❌ لم يتم اختيار ملف.";
+        return;
+      }
+
+      document.getElementById("status").innerText = "⏳ جاري الإرسال...";
+
+      const reader = new FileReader();
+      reader.onload = async function () {
+        const base64File = reader.result.split(",")[1];
+
+        const payload = new URLSearchParams();
+        payload.append("name", formData.get("name"));
+        payload.append("phone", formData.get("phone"));
+        payload.append("fileName", file.name);
+        payload.append("mimeType", file.type);
+        payload.append("fileData", base64File);
+
+        try {
+          const response = await fetch("https://script.google.com/macros/s/AKfycbyrlqaly3_Y6Iusk5i9xzlOOAX_aQ7np0Vas0B-cmaVyy-Gq2F-0YD842H89Co4V1o6/exec", {
+            method: "POST",
+            body: payload,
+          });
+
+          const result = await response.json();
+          document.getElementById("status").innerText = result.message;
+
+          if (result.success && result.redirect) {
+            setTimeout(() => {
+              window.location.href = result.redirect; // الانتقال للصفحة الرئيسية
+            }, 3000);
+          }
+        } catch (err) {
+          document.getElementById("status").innerText = "❌ فشل في الاتصال بالخادم.";
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+  </script>
+</body>
+</html>
