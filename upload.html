@@ -17,16 +17,15 @@
       align-items: center;
       min-height: 100vh;
     }
-
     .container {
-      background: rgba(255, 255, 255, 0.85);
-      padding: 20px;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 24px;
       border-radius: 12px;
-      box-shadow: 0 0 10px #ccc;
-      max-width: 300px;
+      box-shadow: 0 0 12px rgba(0,0,0,0.2);
+      max-width: 320px;
+      width: 90%;
       text-align: center;
     }
-
     input, button {
       margin: 10px 0;
       padding: 10px;
@@ -34,28 +33,32 @@
       font-size: 1rem;
       border-radius: 6px;
       border: 1px solid #ccc;
+      box-sizing: border-box;
     }
-
     button {
       background: #007bff;
       color: #fff;
       cursor: pointer;
+      border: none;
+      transition: background 0.2s;
     }
-
     button:hover {
       background: #0056b3;
     }
-
+    button:disabled {
+      background: #99c2e8;
+      cursor: not-allowed;
+    }
     #status {
       margin-top: 10px;
       font-weight: bold;
       color: #333;
+      min-height: 20px;
     }
-
     .info {
       margin-top: 10px;
       color: #444;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
     }
   </style>
 </head>
@@ -66,30 +69,44 @@
       <input type="text" name="name" placeholder="الاسم الكامل" required>
       <input type="tel" name="phone" placeholder="رقم الهاتف" required>
       <input type="file" name="passport" accept=".pdf,.jpg,.jpeg,.png" required>
-      <button type="submit">إرسال</button>
+      <button type="submit" id="submitBtn">إرسال</button>
     </form>
     <p id="status"></p>
     <p class="info">🔒 نطمئنك أن وثائقك محفوظة ومحمية بإذن الله.</p>
   </div>
 
   <script>
+    // ⚠️ ضع هنا رابط الـ Web App الذي حصلت عليه بعد Deploy لملف Code.gs
+    const SCRIPT_URL = "ضع_رابط_الويب_آب_هنا";
+
     document.getElementById("passportForm").addEventListener("submit", async function (e) {
       e.preventDefault();
-      const formData = new FormData(e.target);
+      const form = e.target;
+      const submitBtn = document.getElementById("submitBtn");
+      const statusEl = document.getElementById("status");
+      const formData = new FormData(form);
       const file = formData.get("passport");
 
-      if (!file) {
-        document.getElementById("status").innerText = "❌ لم يتم اختيار ملف.";
+      if (!file || file.size === 0) {
+        statusEl.innerText = "❌ لم يتم اختيار ملف.";
         return;
       }
 
-      document.getElementById("status").innerText = "⏳ جاري الإرسال...";
+      // حد أقصى معقول لحجم الملف (مثلاً 8 ميغابايت) لتفادي فشل الإرسال
+      const MAX_SIZE = 8 * 1024 * 1024;
+      if (file.size > MAX_SIZE) {
+        statusEl.innerText = "❌ حجم الملف كبير جداً (الحد الأقصى 8 ميغابايت).";
+        return;
+      }
+
+      submitBtn.disabled = true;
+      statusEl.innerText = "⏳ جاري الإرسال...";
 
       const reader = new FileReader();
       reader.onload = async function () {
         const base64File = reader.result.split(",")[1];
-
         const payload = new URLSearchParams();
+        payload.append("sheet", "passport"); // مهم: يوجّه الطلب لمعالج جواز السفر في Code.gs
         payload.append("name", formData.get("name"));
         payload.append("phone", formData.get("phone"));
         payload.append("fileName", file.name);
@@ -97,22 +114,28 @@
         payload.append("fileData", base64File);
 
         try {
-          const response = await fetch("https://script.google.com/macros/s/AKfycbyrlqaly3_Y6Iusk5i9xzlOOAX_aQ7np0Vas0B-cmaVyy-Gq2F-0YD842H89Co4V1o6/exec", {
+          const response = await fetch(SCRIPT_URL, {
             method: "POST",
             body: payload,
           });
-
           const result = await response.json();
-          document.getElementById("status").innerText = result.message;
+          statusEl.innerText = result.message || (result.success ? "✅ تم بنجاح" : "❌ حدث خطأ");
 
           if (result.success && result.redirect) {
             setTimeout(() => {
-              window.location.href = result.redirect; // الانتقال للصفحة الرئيسية
+              window.location.href = result.redirect;
             }, 3000);
+          } else {
+            submitBtn.disabled = false;
           }
         } catch (err) {
-          document.getElementById("status").innerText = "❌ فشل في الاتصال بالخادم.";
+          statusEl.innerText = "❌ فشل في الاتصال بالخادم.";
+          submitBtn.disabled = false;
         }
+      };
+      reader.onerror = function () {
+        statusEl.innerText = "❌ فشل في قراءة الملف.";
+        submitBtn.disabled = false;
       };
       reader.readAsDataURL(file);
     });
