@@ -802,7 +802,7 @@ function normalizeArabic(t) {
 function getAgencyLogo(name="") {
   const n = normalizeArabic(name);
   if (/تقرت/.test(n))       return "https://i.ibb.co/2XWLPsc/1766858356356-removebg-preview.png";
-  if (/انسية|انسيه/.test(n)) return "https://i.ibb.co/Mk97KqGK/FB-IMG-1766861138141-removebg-preview.png";
+  if (/الأنسية/.test(n)) return "https://i.ibb.co/Mk97KqGK/FB-IMG-1766861138141-removebg-preview.png";
   if (/سقيف/.test(n))       return "https://i.ibb.co/mmrx9QG/FB-IMG-1766861105309-removebg-preview.png";
   return "";
 }
