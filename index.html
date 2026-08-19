@@ -205,6 +205,51 @@
     }
     .sidebar nav a .icon { font-size: 1.2em; }
 
+    /* ===== FLOATING SOCIAL SIDEBAR ===== */
+    .social-sidebar {
+      position: fixed;
+      top: 50%;
+      left: 14px;
+      transform: translateY(-50%);
+      z-index: 997;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .social-sidebar a {
+      width: 46px; height: 46px;
+      border-radius: 50%;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: var(--shadow);
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+    .social-sidebar a svg {
+      width: 22px; height: 22px;
+      transition: transform 0.3s ease;
+    }
+    .social-sidebar a:hover {
+      transform: translateX(-4px) scale(1.08);
+      box-shadow: var(--shadow-lg);
+    }
+    .social-sidebar a.fb:hover  { background: #1877F2; border-color: #1877F2; }
+    .social-sidebar a.ig:hover  { background: radial-gradient(circle at 30% 110%, #fdf497 0%, #fd5949 45%, #d6249f 60%, #285AEB 90%); border-color: transparent; }
+    .social-sidebar a.tt:hover  { background: #010101; border-color: #010101; }
+    .social-sidebar a.wa:hover  { background: #25D366; border-color: #25D366; }
+    .social-sidebar a:hover svg { filter: brightness(0) invert(1); }
+    .social-sidebar a.fb svg  { fill: #1877F2; }
+    .social-sidebar a.ig svg  { fill: #d6249f; }
+    .social-sidebar a.tt svg  { fill: #010101; }
+    .social-sidebar a.wa svg  { fill: #25D366; }
+
+    @media(max-width:600px){
+      .social-sidebar { left: 8px; gap: 8px; }
+      .social-sidebar a { width: 40px; height: 40px; }
+      .social-sidebar a svg { width: 19px; height: 19px; }
+    }
+
     /* ===== HERO ===== */
     .hero {
       position: relative;
@@ -678,8 +723,8 @@
     <div class="logo-wrap">
       <img src="https://res.cloudinary.com/dmc36nijl/image/upload/v1780784017/file_000000007a4871f496e95d1042fe2349_jt6lsc.png" alt="طريق العمرة">
       <div class="logo-text">
-        <strong>طريق العمرة</strong>
-        <small>المرشد طه برقيقة</small>
+        <strong>طه برقيقة لخدمات العمرة</strong>
+        <small>وكالة تقرت للسياحة و الاسفار</small>
       </div>
     </div>
     <div class="top-actions">
@@ -691,6 +736,22 @@
       <button class="menu-btn" onclick="openSidebar()">☰</button>
     </div>
   </header>
+
+  <!-- Floating Social Sidebar -->
+  <div class="social-sidebar">
+    <a class="fb" href="https://www.facebook.com/profile.php?id=61566467677935&mibextid=ZbWKwL" target="_blank" rel="noopener" aria-label="فيسبوك">
+      <svg viewBox="0 0 24 24"><path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.84 3.44 8.87 8 9.8v-6.93H7.9V12H10V9.8c0-2.07 1.23-3.22 3.11-3.22.9 0 1.84.16 1.84.16v2.02h-1.04c-1.02 0-1.34.64-1.34 1.3V12h2.28l-.36 2.87h-1.92v6.93c4.56-.93 8-4.96 8-9.8z"/></svg>
+    </a>
+    <a class="ig" href="https://www.instagram.com/taha.omra99?igsh=Zndnb2dvbm9xanFi" target="_blank" rel="noopener" aria-label="انستغرام">
+      <svg viewBox="0 0 24 24"><path d="M12 2.16c3.2 0 3.58.01 4.85.07 1.17.05 1.8.25 2.23.41.56.22.96.47 1.38.9.42.42.68.82.9 1.38.16.42.36 1.06.41 2.23.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.05 1.17-.25 1.8-.41 2.23-.22.56-.47.96-.9 1.38-.42.42-.82.68-1.38.9-.42.16-1.06.36-2.23.41-1.27.06-1.65.07-4.85.07s-3.58-.01-4.85-.07c-1.17-.05-1.8-.25-2.23-.41-.56-.22-.96-.47-1.38-.9-.42-.42-.68-.82-.9-1.38-.16-.42-.36-1.06-.41-2.23-.06-1.27-.07-1.65-.07-4.85s.01-3.58.07-4.85c.05-1.17.25-1.8.41-2.23.22-.56.47-.96.9-1.38.42-.42.82-.68 1.38-.9.42-.16 1.06-.36 2.23-.41 1.27-.06 1.65-.07 4.85-.07M12 0C8.74 0 8.33.01 7.05.07 5.78.13 4.9.33 4.14.63c-.79.31-1.46.72-2.13 1.38C1.35 2.68.94 3.35.63 4.14.33 4.9.13 5.78.07 7.05.01 8.33 0 8.74 0 12s.01 3.67.07 4.95c.06 1.27.26 2.15.56 2.91.31.79.72 1.46 1.38 2.13.67.66 1.34 1.07 2.13 1.38.76.3 1.64.5 2.91.56C8.33 23.99 8.74 24 12 24s3.67-.01 4.95-.07c1.27-.06 2.15-.26 2.91-.56.79-.31 1.46-.72 2.13-1.38.66-.67 1.07-1.34 1.38-2.13.3-.76.5-1.64.56-2.91.06-1.28.07-1.69.07-4.95s-.01-3.67-.07-4.95c-.06-1.27-.26-2.15-.56-2.91-.31-.79-.72-1.46-1.38-2.13C21.32 1.35 20.65.94 19.86.63c-.76-.3-1.64-.5-2.91-.56C15.67.01 15.26 0 12 0zm0 5.84A6.16 6.16 0 1 0 12 18.16 6.16 6.16 0 0 0 12 5.84zm0 10.16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.41-10.4a1.44 1.44 0 1 1-2.88 0 1.44 1.44 0 0 1 2.88 0z"/></svg>
+    </a>
+    <a class="tt" href="https://www.tiktok.com/@tariq_uoumra?_r=1&_t=ZS-991BVZvw0lG" target="_blank" rel="noopener" aria-label="تيك توك">
+      <svg viewBox="0 0 24 24"><path d="M16.6 5.82c-1.02-.98-1.66-2.34-1.66-3.82h-3.4v13.53a2.6 2.6 0 1 1-2.6-2.6c.19 0 .38.02.56.06V9.44a6.02 6.02 0 0 0-.56-.02 6.03 6.03 0 1 0 6.03 6.03V9.65a9.35 9.35 0 0 0 5.03 1.46v-3.4a5.6 5.6 0 0 1-3.4-1.89z"/></svg>
+    </a>
+    <a class="wa" href="https://wa.me/213674141379" target="_blank" rel="noopener" aria-label="واتساب">
+      <svg viewBox="0 0 24 24"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.29-1.39a9.9 9.9 0 0 0 4.75 1.21h.01c5.46 0 9.9-4.45 9.9-9.91C22 6.45 17.5 2 12.04 2zm5.79 14.02c-.24.68-1.4 1.3-1.94 1.38-.5.08-1.12.11-1.81-.11-.42-.13-.95-.31-1.63-.6-2.87-1.24-4.74-4.15-4.89-4.34-.14-.19-1.17-1.55-1.17-2.96 0-1.41.74-2.1 1-2.39.26-.28.57-.35.76-.35h.55c.18 0 .42-.07.66.5.24.58.82 2 .89 2.15.07.14.12.31.02.5-.09.19-.14.31-.28.47-.14.17-.29.37-.42.5-.14.14-.28.29-.12.57.16.28.71 1.17 1.53 1.9 1.05.94 1.94 1.23 2.22 1.37.28.14.44.12.6-.07.16-.19.68-.79.86-1.06.18-.28.35-.23.6-.14.24.09 1.55.73 1.82.86.26.14.44.2.5.32.07.11.07.65-.17 1.33z"/></svg>
+    </a>
+  </div>
 
   <!-- Hero -->
   <section class="hero">
@@ -850,6 +911,9 @@
     </p>
   </footer>
 
+  <!-- Flag -->
+  <img src="https://i.postimg.cc/NMYFtQcr/IMG-20250609-WA0000.jpg" class="flag" alt="علم">
+
   <!-- Bottom Nav -->
   <nav class="bottom-nav">
     <a href="upload.html"><span class="nav-icon">📤</span><span>جواز السفر</span></a>
@@ -858,9 +922,6 @@
     <a href="contact.html"><span class="nav-icon">📞</span><span>اتصل بنا</span></a>
     <a href="about.html"><span class="nav-icon">❔</span><span>من نحن</span></a>
   </nav>
-
-  <!-- Flag -->
-  <img src="https://i.postimg.cc/NMYFtQcr/IMG-20250609-WA0000.jpg" class="flag" alt="علم">
 
   <script>
     /* DateTime */
