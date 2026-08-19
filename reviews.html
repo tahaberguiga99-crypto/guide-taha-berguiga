@@ -3,14 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="آراء وتعليقات المعتمرين حول تجربتهم">
   <title>آراء المعتمرين</title>
   <style>
+    * { box-sizing: border-box; }
+
     body {
       background: url('https://i.postimg.cc/W36hVtzB/FB-IMG-1753465795592.jpg') no-repeat center center fixed;
       background-size: cover;
       margin: 0;
       padding: 0;
       font-family: 'Tahoma', sans-serif;
+      min-height: 100vh;
     }
 
     nav {
@@ -25,7 +29,7 @@
       font-size: 16px;
       padding: 8px 12px;
     }
-    nav a:hover {
+    nav a:hover, nav a:focus-visible {
       color: #ffd700;
     }
 
@@ -53,6 +57,13 @@
       box-shadow: 0 0 4px rgba(0, 0, 0, 0.1);
     }
 
+    label {
+      display: block;
+      font-size: 13px;
+      color: #555;
+      margin-top: 8px;
+    }
+
     input, textarea, select {
       width: 100%;
       padding: 10px;
@@ -61,6 +72,18 @@
       border-radius: 6px;
       font-size: 14px;
       box-sizing: border-box;
+      font-family: inherit;
+    }
+    input:focus-visible, textarea:focus-visible, select:focus-visible, button:focus-visible {
+      outline: 2px solid #007bff;
+      outline-offset: 1px;
+    }
+
+    .char-count {
+      font-size: 12px;
+      color: #888;
+      text-align: left;
+      margin-top: -2px;
     }
 
     button {
@@ -73,9 +96,22 @@
       font-size: 15px;
       width: 100%;
       margin-top: 5px;
+      transition: background 0.15s ease, opacity 0.15s ease;
     }
-    button:hover {
+    button:hover:not(:disabled) {
       background: #0056b3;
+    }
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .action-btn {
+      width: auto;
+      display: inline-block;
+      margin-left: 6px;
+      padding: 6px 12px;
+      font-size: 13px;
     }
 
     .reply-box {
@@ -89,17 +125,47 @@
 
     .likes {
       color: #e91e63;
-      margin-right: 10px;
+      margin-left: 10px;
       font-size: 14px;
     }
 
     .delete-btn {
       background: #dc3545;
     }
+    .delete-btn:hover:not(:disabled) {
+      background: #a71d2a;
+    }
 
     .site-like {
       margin-bottom: 15px;
       text-align: center;
+    }
+    .site-like button {
+      width: auto;
+      display: inline-block;
+      padding: 10px 20px;
+    }
+
+    #siteLikeStatus {
+      margin-top: 6px;
+      font-size: 14px;
+      color: #555;
+    }
+
+    .status-msg {
+      text-align: center;
+      color: #777;
+      font-size: 14px;
+      padding: 10px;
+    }
+    .error-msg {
+      text-align: center;
+      color: #b00020;
+      font-size: 14px;
+      padding: 10px;
+      background: #fdecea;
+      border-radius: 8px;
+      margin-bottom: 10px;
     }
 
     @media (max-width: 600px) {
@@ -126,20 +192,29 @@
     <h2>آراء المعتمرين</h2>
 
     <div class="site-like">
-      <button onclick="likeSite()">❤️ أعجبني الموقع</button>
+      <button id="siteLikeBtn" onclick="likeSite()">❤️ أعجبني الموقع</button>
       <div id="siteLikeStatus"></div>
     </div>
 
     <div class="comment-box">
-      <input type="text" id="name" placeholder="الاسم">
+      <label for="name">الاسم</label>
+      <input type="text" id="name" placeholder="الاسم" maxlength="50">
+
+      <label for="wilaya">الولاية</label>
       <select id="wilaya">
         <option value="">اختر ولايتك</option>
       </select>
-      <textarea id="comment" placeholder="اكتب تعليقك هنا..."></textarea>
-      <button onclick="addComment()">إرسال التعليق</button>
+
+      <label for="comment">تعليقك</label>
+      <textarea id="comment" placeholder="اكتب تعليقك هنا..." maxlength="500" rows="4" oninput="updateCharCount()"></textarea>
+      <div class="char-count" id="charCount">0 / 500</div>
+
+      <button id="submitBtn" onclick="addComment()">إرسال التعليق</button>
     </div>
 
-    <div id="commentsContainer"></div>
+    <div id="commentsContainer">
+      <div class="status-msg">جارٍ تحميل التعليقات...</div>
+    </div>
   </div>
 
   <script>
@@ -149,6 +224,7 @@
       "وهران", "البيض", "إليزي", "برج بوعريريج", "بومرداس", "الطارف", "تندوف", "تيسمسيلت", "الوادي", "خنشلة",
       "سوق أهراس", "تيبازة", "ميلة", "عين الدفلى", "النعامة", "عين تموشنت", "غرداية", "غليزان", "تميمون", "برج باجي مختار",
       "أولاد جلال", "بني عباس", "عين قزام", "تقرت", "جانت", "المغير", "المنيعة", "دار البيضاء"];
+
     const wilayaSelect = document.getElementById("wilaya");
     wilayas.forEach(w => {
       const option = document.createElement("option");
@@ -158,17 +234,60 @@
     });
 
     const scriptURL = 'https://script.google.com/macros/s/AKfycbzPp2uk0EIIgGAECnlQD3AoEzvGs5IEgkbX-rb5lg_YLBvBR1ZcIbUb6zTNXc_i9iNh/exec?sheet=reviews';
+
     const clientID = localStorage.getItem("clientID") || (() => {
       const id = Date.now() + "-" + Math.random().toString(36).substring(2);
       localStorage.setItem("clientID", id);
       return id;
     })();
 
+    // منع تكرار "إعجاب الموقع" أكثر من مرة من نفس الجهاز
+    const hasLikedSite = () => localStorage.getItem("siteLiked") === "1";
+
+    // ---------- أدوات مساعدة ----------
+
+    // لمنع ثغرات XSS: تحويل أي نص خام إلى نص آمن قبل إدراجه في الصفحة
+    function escapeHTML(str) {
+      const div = document.createElement("div");
+      div.textContent = str ?? "";
+      return div.innerHTML;
+    }
+
+    function setButtonLoading(btn, loadingText) {
+      if (!btn) return;
+      btn.dataset.originalText = btn.dataset.originalText || btn.textContent;
+      btn.disabled = true;
+      btn.textContent = loadingText;
+    }
+    function resetButton(btn) {
+      if (!btn) return;
+      btn.disabled = false;
+      if (btn.dataset.originalText) btn.textContent = btn.dataset.originalText;
+    }
+
+    function updateCharCount() {
+      const el = document.getElementById("comment");
+      document.getElementById("charCount").textContent = `${el.value.length} / 500`;
+    }
+
+    // ---------- التعليقات ----------
+
     function addComment() {
-      const name = document.getElementById("name").value.trim();
-      const wilaya = document.getElementById("wilaya").value.trim();
-      const comment = document.getElementById("comment").value.trim();
-      if (!name || !wilaya || !comment) return alert("يرجى تعبئة جميع الحقول");
+      const nameEl = document.getElementById("name");
+      const wilayaEl = document.getElementById("wilaya");
+      const commentEl = document.getElementById("comment");
+
+      const name = nameEl.value.trim();
+      const wilaya = wilayaEl.value.trim();
+      const comment = commentEl.value.trim();
+
+      if (!name || !wilaya || !comment) {
+        alert("يرجى تعبئة جميع الحقول");
+        return;
+      }
+
+      const btn = document.getElementById("submitBtn");
+      setButtonLoading(btn, "جارٍ الإرسال...");
 
       fetch(scriptURL, {
         method: 'POST',
@@ -177,96 +296,160 @@
           name, wilaya, comment,
           client: clientID
         })
-      }).then(() => {
-        document.getElementById("comment").value = "";
-        getComments();
-      });
+      })
+        .then(res => {
+          if (!res.ok) throw new Error("network");
+          commentEl.value = "";
+          updateCharCount();
+          return getComments();
+        })
+        .catch(() => {
+          alert("تعذر إرسال التعليق. يرجى المحاولة مرة أخرى.");
+        })
+        .finally(() => resetButton(btn));
     }
 
     function getComments() {
-      fetch(scriptURL)
-        .then(res => res.json())
+      const container = document.getElementById("commentsContainer");
+      return fetch(scriptURL)
+        .then(res => {
+          if (!res.ok) throw new Error("network");
+          return res.json();
+        })
         .then(data => {
-          const container = document.getElementById("commentsContainer");
           container.innerHTML = "";
-          data.reverse().forEach(c => {
-            const commentEl = document.createElement("div");
-            commentEl.className = "comment";
-            commentEl.innerHTML = `
-              <strong>${c.name} (${c.wilaya})</strong><br>
-              <small>${new Date(c.date).toLocaleString()}</small><br><br>
-              ${c.comment}<br><br>
-              <span class="likes">❤️ ${c.likes}</span>
-              <button onclick="likeComment(${c.row})">أعجبني</button>
-              <button onclick="showReply(${c.row})">رد</button>
-              ${c.client === clientID ? `<button class="delete-btn" onclick="deleteComment(${c.row})">🗑️ حذف</button>` : ""}
-              <div class="reply-box" id="replies-${c.row}">
-                ${c.replies.filter(r => r).map(r => `<div>↪️ ${r}</div>`).join("")}
-              </div>
+
+          if (!Array.isArray(data) || data.length === 0) {
+            container.innerHTML = '<div class="status-msg">لا توجد تعليقات بعد. كن أول من يكتب رأيه!</div>';
+            return;
+          }
+
+          [...data].reverse().forEach(c => {
+            const el = document.createElement("div");
+            el.className = "comment";
+
+            const repliesHTML = (c.replies || [])
+              .filter(r => r)
+              .map(r => `<div>↪️ ${escapeHTML(r)}</div>`)
+              .join("");
+
+            el.innerHTML = `
+              <strong>${escapeHTML(c.name)} (${escapeHTML(c.wilaya)})</strong><br>
+              <small>${c.date ? new Date(c.date).toLocaleString('ar-DZ') : ''}</small><br><br>
+              ${escapeHTML(c.comment)}<br><br>
+              <span class="likes">❤️ ${Number(c.likes) || 0}</span>
+              <button class="action-btn" data-action="like">أعجبني</button>
+              <button class="action-btn" data-action="reply">رد</button>
+              ${c.client === clientID ? `<button class="action-btn delete-btn" data-action="delete">🗑️ حذف</button>` : ""}
+              <div class="reply-box" id="replies-${c.row}">${repliesHTML}</div>
             `;
-            container.appendChild(commentEl);
+
+            el.querySelector('[data-action="like"]').addEventListener('click', e => likeComment(c.row, e.target));
+            el.querySelector('[data-action="reply"]').addEventListener('click', () => showReply(c.row));
+            const delBtn = el.querySelector('[data-action="delete"]');
+            if (delBtn) delBtn.addEventListener('click', e => deleteComment(c.row, e.target));
+
+            container.appendChild(el);
           });
+        })
+        .catch(() => {
+          container.innerHTML = '<div class="error-msg">تعذر تحميل التعليقات. تحقق من اتصالك بالإنترنت وحاول مجددًا.</div>';
         });
     }
 
-    function likeComment(row) {
+    function likeComment(row, btn) {
+      if (btn) btn.disabled = true;
       fetch(scriptURL, {
         method: 'POST',
         body: new URLSearchParams({
           action: 'likeComment',
           row, client: clientID
         })
-      }).then(() => getComments());
+      })
+        .then(() => getComments())
+        .catch(() => alert("تعذر تسجيل الإعجاب."))
+        .finally(() => { if (btn) btn.disabled = false; });
     }
 
     function showReply(row) {
       const reply = prompt("اكتب ردك:");
-      if (reply) {
-        const name = document.getElementById("name").value || "زائر";
-        const wilaya = document.getElementById("wilaya").value || "؟";
-        fetch(scriptURL, {
-          method: 'POST',
-          body: new URLSearchParams({
-            action: 'addReply',
-            row, reply, name, wilaya
-          })
-        }).then(() => getComments());
-      }
+      if (!reply || !reply.trim()) return;
+
+      const name = document.getElementById("name").value.trim() || "زائر";
+      const wilaya = document.getElementById("wilaya").value.trim() || "؟";
+
+      fetch(scriptURL, {
+        method: 'POST',
+        body: new URLSearchParams({
+          action: 'addReply',
+          row, reply: reply.trim(), name, wilaya
+        })
+      })
+        .then(() => getComments())
+        .catch(() => alert("تعذر إرسال الرد."));
     }
 
-    function deleteComment(row) {
-      if (confirm("هل أنت متأكد أنك تريد حذف تعليقك؟")) {
-        fetch(scriptURL, {
-          method: 'POST',
-          body: new URLSearchParams({
-            action: 'deleteComment',
-            row, client: clientID
-          })
-        }).then(() => getComments());
-      }
+    function deleteComment(row, btn) {
+      if (!confirm("هل أنت متأكد أنك تريد حذف تعليقك؟")) return;
+      if (btn) btn.disabled = true;
+
+      fetch(scriptURL, {
+        method: 'POST',
+        body: new URLSearchParams({
+          action: 'deleteComment',
+          row, client: clientID
+        })
+      })
+        .then(() => getComments())
+        .catch(() => {
+          alert("تعذر حذف التعليق.");
+          if (btn) btn.disabled = false;
+        });
     }
+
+    // ---------- إعجاب الموقع ----------
 
     function likeSite() {
+      if (hasLikedSite()) {
+        alert("لقد أعجبت بالموقع من قبل، شكرًا لك!");
+        return;
+      }
+      const btn = document.getElementById("siteLikeBtn");
+      setButtonLoading(btn, "جارٍ التسجيل...");
+
       fetch(scriptURL, {
         method: 'POST',
         body: new URLSearchParams({
           action: 'likeSite',
           client: clientID
         })
-      }).then(() => updateLikeCount());
+      })
+        .then(() => {
+          localStorage.setItem("siteLiked", "1");
+          return updateLikeCount();
+        })
+        .catch(() => alert("تعذر تسجيل الإعجاب. حاول مرة أخرى."))
+        .finally(() => resetButton(btn));
     }
 
     function updateLikeCount() {
-      fetch(scriptURL + "&action=getSiteLikes")
+      return fetch(scriptURL + "&action=getSiteLikes")
         .then(res => res.text())
         .then(count => {
           document.getElementById("siteLikeStatus").innerText = `إعجاب الموقع: ❤️ ${count}`;
+        })
+        .catch(() => {
+          document.getElementById("siteLikeStatus").innerText = "";
         });
     }
 
-    window.onload = function() {
+    window.onload = function () {
       getComments();
       updateLikeCount();
+      updateCharCount();
+      if (hasLikedSite()) {
+        document.getElementById("siteLikeBtn").textContent = "❤️ أعجبك الموقع";
+      }
     };
   </script>
 </body>
